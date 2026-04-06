@@ -1,0 +1,446 @@
+<template>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="logo-title">
+                    <div class="logo">🚦</div>
+                    <div class="title-block">
+                        <h1>Greenlight</h1>
+                        <p class="subtitle">Agentforce Test Results</p>
+                    </div>
+                </div>
+                <div class="agent-info">
+                    <div class="info-item">
+                        <span class="info-label">Agent</span>
+                        <span class="info-value">{data.agentLabel}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">API Name</span>
+                        <span class="info-value mono">{data.agentName}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Version</span>
+                        <span class="info-value">{data.version}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Org</span>
+                        <span class="info-value">{data.org}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-status">
+                <div class="go-live-badge">
+                    <span class="badge-label">Go-Live Readiness</span>
+                    <div class={goLiveStatusClass}>
+                        <span class="status-icon">{goLiveStatusIcon}</span>
+                        <span class="status-text">{data.goLiveStatus}</span>
+                    </div>
+                </div>
+                <div class="timestamp">
+                    <span class="timestamp-label">Test Run</span>
+                    <span class="timestamp-value">{formattedTimestamp}</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Tab Navigation -->
+        <nav class="tab-nav">
+            <button class={overviewTabClass} data-tab="overview" onclick={handleTabClick}>
+                <span class="tab-icon">📊</span> Overview
+            </button>
+            <button class={jobsTabClass} data-tab="jobs" onclick={handleTabClick}>
+                <span class="tab-icon">📋</span> Results by Job
+            </button>
+            <button class={detailsTabClass} data-tab="details" onclick={handleTabClick}>
+                <span class="tab-icon">🔍</span> Detailed Results
+            </button>
+            <button class={recommendationsTabClass} data-tab="recommendations" onclick={handleTabClick}>
+                <span class="tab-icon">💡</span> Recommendations
+            </button>
+        </nav>
+
+        <!-- Tab Content -->
+        <main class="tab-content">
+            <!-- Overview Tab -->
+            <template lwc:if={showOverview}>
+                <div class="overview-grid">
+                    <!-- Summary Cards Row 1 -->
+                    <div class="card summary-card">
+                        <div class="card-icon">🧪</div>
+                        <div class="card-body">
+                            <div class="card-header">Total Tests</div>
+                            <div class="card-value">{data.summary.totalTests}</div>
+                            <div class="card-subtext">
+                                <span class="pass-text">{data.summary.passed} passed</span>
+                                <span class="divider">·</span>
+                                <span class="fail-text">{data.summary.failed} failed</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card summary-card">
+                        <div class="card-icon">📈</div>
+                        <div class="card-body">
+                            <div class="card-header">Pass Rate</div>
+                            <div class="card-value">{data.summary.passRate}<span class="unit">%</span></div>
+                            <div class="progress-bar">
+                                <div class="bar-fill" data-status={passRateStatus} style={passRateStyle}></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card summary-card">
+                        <div class="card-icon">🎯</div>
+                        <div class="card-body">
+                            <div class="card-header">Topic Accuracy</div>
+                            <div class="card-value">{data.summary.topicAccuracy}<span class="unit">%</span></div>
+                            <div class="progress-bar">
+                                <div class="bar-fill" data-status={topicAccuracyStatus} style={topicAccuracyStyle}></div>
+                            </div>
+                            <div class="target-text">Target: ≥{data.targets.topicAccuracy}%</div>
+                        </div>
+                    </div>
+
+                    <div class="card summary-card">
+                        <div class="card-icon">⚡</div>
+                        <div class="card-body">
+                            <div class="card-header">Action Accuracy</div>
+                            <div class="card-value">{data.summary.actionAccuracy}<span class="unit">%</span></div>
+                            <div class="progress-bar">
+                                <div class="bar-fill" data-status={actionAccuracyStatus} style={actionAccuracyStyle}></div>
+                            </div>
+                            <div class="target-text">Target: ≥{data.targets.actionAccuracy}%</div>
+                        </div>
+                    </div>
+
+                    <!-- Latency Card -->
+                    <div class="card summary-card latency-card">
+                        <div class="card-icon">⏱️</div>
+                        <div class="card-body">
+                            <div class="card-header">Avg Response Time</div>
+                            <div class="card-value">{data.summary.avgLatency}<span class="unit">ms</span></div>
+                            <div class="latency-status excellent">Excellent</div>
+                        </div>
+                    </div>
+
+                    <!-- Quality Scores -->
+                    <div class="card quality-card">
+                        <div class="card-header-large">Response Quality Scores</div>
+                        <div class="quality-scores">
+                            <div class="quality-item">
+                                <div class="quality-ring" data-score={data.summary.avgCompleteness}>
+                                    <span class="ring-value">{data.summary.avgCompleteness}</span>
+                                </div>
+                                <span class="quality-label">Completeness</span>
+                            </div>
+                            <div class="quality-item">
+                                <div class="quality-ring" data-score={data.summary.avgCoherence}>
+                                    <span class="ring-value">{data.summary.avgCoherence}</span>
+                                </div>
+                                <span class="quality-label">Coherence</span>
+                            </div>
+                            <div class="quality-item">
+                                <div class="quality-ring" data-score={data.summary.avgConciseness}>
+                                    <span class="ring-value">{data.summary.avgConciseness}</span>
+                                </div>
+                                <span class="quality-label">Conciseness</span>
+                            </div>
+                        </div>
+                        <div class="quality-legend">Score out of 5.0 (LLM evaluation)</div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Jobs Tab -->
+            <template lwc:elseif={showJobs}>
+                <div class="jobs-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Priority</th>
+                                <th>Job Name</th>
+                                <th>Topic</th>
+                                <th class="center">Tests</th>
+                                <th class="center">Passed</th>
+                                <th class="center">Failed</th>
+                                <th>Pass Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={jobsForDisplay} for:item="job">
+                                <tr key={job.id} class={job.rowClass}>
+                                    <td><span class={job.priorityClass}>{job.priority}</span></td>
+                                    <td class="job-name">{job.name}</td>
+                                    <td class="topic-cell">{job.topic}</td>
+                                    <td class="center">{job.totalTests}</td>
+                                    <td class="center pass-text">{job.passed}</td>
+                                    <td class="center fail-text">{job.failed}</td>
+                                    <td>
+                                        <div class="rate-cell">
+                                            <div class="progress-bar small">
+                                                <div class="bar-fill" data-status={job.passRateStatus} style={job.passRateStyle}></div>
+                                            </div>
+                                            <span class="rate-text">{job.passRate}%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+
+            <!-- Details Tab -->
+            <template lwc:elseif={showDetails}>
+                <div class="details-container">
+                    <!-- Filter Bar -->
+                    <div class="filter-bar">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <span class="filter-label">Status:</span>
+                                <button class={filterAllClass} data-filter="all" onclick={handleFilterClick}>
+                                    All ({data.summary.totalTests})
+                                </button>
+                                <button class={filterPassClass} data-filter="pass" onclick={handleFilterClick}>
+                                    ✓ Passed ({data.summary.passed})
+                                </button>
+                                <button class={filterFailClass} data-filter="fail" onclick={handleFilterClick}>
+                                    ✗ Failed ({data.summary.failed})
+                                </button>
+                            </div>
+                            <div class="filter-group">
+                                <span class="filter-label">Job:</span>
+                                <select class="job-select" onchange={handleJobFilterChange}>
+                                    <option value="all">All Jobs</option>
+                                    <template for:each={jobOptions} for:item="job">
+                                        <option key={job.id} value={job.id}>{job.name}</option>
+                                    </template>
+                                </select>
+                            </div>
+                            <div class="search-group">
+                                <span class="search-icon">🔍</span>
+                                <input 
+                                    type="text" 
+                                    class="search-input" 
+                                    placeholder="Search utterances..." 
+                                    onkeyup={handleSearchInput}
+                                    value={searchTerm}
+                                />
+                                <template lwc:if={searchTerm}>
+                                    <button class="clear-search" onclick={handleClearSearch}>✕</button>
+                                </template>
+                            </div>
+                        </div>
+                        <div class="filter-actions">
+                            <div class="results-count">
+                                Showing {filteredCount} of {data.summary.totalTests} tests
+                            </div>
+                            <div class="expand-controls">
+                                <button class="expand-btn" onclick={handleExpandAll}>
+                                    <span class="btn-icon">⊞</span> Expand All
+                                </button>
+                                <button class="expand-btn" onclick={handleCollapseAll}>
+                                    <span class="btn-icon">⊟</span> Collapse All
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="details-table-container">
+                        <table class="data-table details-table">
+                            <thead>
+                                <tr>
+                                    <th class="expand-col"></th>
+                                    <th class="status-col">Status</th>
+                                    <th>Priority</th>
+                                    <th>Utterance</th>
+                                    <th class="center">Topic</th>
+                                    <th class="center">Action</th>
+                                    <th class="center">Output</th>
+                                    <th class="center">Latency</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={testCasesForDisplay} for:item="tc">
+                                    <tr key={tc.key} class={tc.rowClass} data-key={tc.key} onclick={handleRowToggle}>
+                                        <td class="expand-col">
+                                            <span class="chevron">{tc.chevron}</span>
+                                        </td>
+                                        <td class="status-col">
+                                            <span class={tc.statusClass}>{tc.statusIcon} {tc.status}</span>
+                                        </td>
+                                        <td><span class={tc.priorityClass}>{tc.priority}</span></td>
+                                        <td class="utterance-cell">
+                                            <span class="utterance-text">{tc.utterance}</span>
+                                            <button class="copy-btn" data-utterance={tc.utterance} onclick={handleCopyUtterance} title="Copy utterance">
+                                                📋
+                                            </button>
+                                        </td>
+                                        <td class="center">
+                                            <span class={tc.topicClass}>{tc.topicIcon}</span>
+                                        </td>
+                                        <td class="center">
+                                            <span class={tc.actionClass}>{tc.actionIcon}</span>
+                                        </td>
+                                        <td class="center">
+                                            <span class={tc.outputClass}>{tc.outputScore}/5</span>
+                                        </td>
+                                        <td class="center latency-cell">
+                                            {tc.latency}ms
+                                        </td>
+                                    </tr>
+                                    <template lwc:if={tc.isExpanded}>
+                                        <tr key={tc.expandedKey} class="detail-row">
+                                            <td colspan="8">
+                                                <div class="detail-content">
+                                                    <div class="detail-grid">
+                                                        <!-- Topic Section -->
+                                                        <div class="detail-section">
+                                                            <div class="section-header">
+                                                                <span class={tc.topicClass}>{tc.topicIcon}</span>
+                                                                Topic Routing
+                                                            </div>
+                                                            <div class="comparison">
+                                                                <div class="compare-item">
+                                                                    <span class="compare-label">Expected</span>
+                                                                    <span class="compare-value mono">{tc.expectedTopic}</span>
+                                                                </div>
+                                                                <div class="compare-arrow">→</div>
+                                                                <div class="compare-item">
+                                                                    <span class="compare-label">Actual</span>
+                                                                    <span class="compare-value mono">{tc.actualTopic}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Actions Section -->
+                                                        <div class="detail-section">
+                                                            <div class="section-header">
+                                                                <span class={tc.actionClass}>{tc.actionIcon}</span>
+                                                                Actions Invoked
+                                                            </div>
+                                                            <div class="comparison">
+                                                                <div class="compare-item">
+                                                                    <span class="compare-label">Expected</span>
+                                                                    <span class="compare-value mono">{tc.expectedActionsStr}</span>
+                                                                </div>
+                                                                <div class="compare-arrow">→</div>
+                                                                <div class="compare-item">
+                                                                    <span class="compare-label">Actual</span>
+                                                                    <span class="compare-value mono">{tc.actualActionsStr}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Scores Section -->
+                                                        <div class="detail-section scores-section">
+                                                            <div class="section-header">Quality Scores</div>
+                                                            <div class="scores-grid">
+                                                                <div class="score-item">
+                                                                    <span class="score-value">{tc.completenessScore}</span>
+                                                                    <span class="score-label">Completeness</span>
+                                                                </div>
+                                                                <div class="score-item">
+                                                                    <span class="score-value">{tc.coherenceScore}</span>
+                                                                    <span class="score-label">Coherence</span>
+                                                                </div>
+                                                                <div class="score-item">
+                                                                    <span class="score-value">{tc.concisenessScore}</span>
+                                                                    <span class="score-label">Conciseness</span>
+                                                                </div>
+                                                                <div class="score-item">
+                                                                    <span class="score-value">{tc.outputScore}</span>
+                                                                    <span class="score-label">Output</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Explainability -->
+                                                    <template lwc:if={tc.explainability}>
+                                                        <div class="explainability-section">
+                                                            <div class="section-header">🤖 LLM Evaluation Reasoning</div>
+                                                            <div class="explainability-text">{tc.explainability}</div>
+                                                        </div>
+                                                    </template>
+
+                                                    <!-- Agent Response -->
+                                                    <div class="response-section">
+                                                        <div class="section-header">💬 Agent Response</div>
+                                                        <div class="agent-response" lwc:inner-html={tc.outcomeHtml}></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Recommendations Tab -->
+            <template lwc:elseif={showRecommendations}>
+                <div class="recommendations-container">
+                    <div class="card recommendations-card immediate">
+                        <div class="rec-card-header">
+                            <span class="rec-icon">🚨</span>
+                            <h3>Immediate Actions</h3>
+                            <span class="rec-subtitle">Address before go-live</span>
+                        </div>
+                        <template for:each={data.recommendations.immediate} for:item="rec">
+                            <div key={rec.title} class="recommendation-item">
+                                <div class="rec-header">
+                                    <strong>{rec.title}</strong>
+                                    <div class="rec-tags">
+                                        <span class="tag impact-high">Impact: {rec.impact}</span>
+                                        <span class="tag effort-low">Effort: {rec.effort}</span>
+                                    </div>
+                                </div>
+                                <p class="rec-description">{rec.description}</p>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="card recommendations-card">
+                        <div class="rec-card-header">
+                            <span class="rec-icon">📋</span>
+                            <h3>Short-Term Improvements</h3>
+                            <span class="rec-subtitle">Next sprint</span>
+                        </div>
+                        <ul class="rec-list">
+                            <template for:each={data.recommendations.shortTerm} for:item="item">
+                                <li key={item}>{item}</li>
+                            </template>
+                        </ul>
+                    </div>
+
+                    <div class="card recommendations-card">
+                        <div class="rec-card-header">
+                            <span class="rec-icon">🎯</span>
+                            <h3>Long-Term Strategy</h3>
+                            <span class="rec-subtitle">Roadmap items</span>
+                        </div>
+                        <ul class="rec-list">
+                            <template for:each={data.recommendations.longTerm} for:item="item">
+                                <li key={item}>{item}</li>
+                            </template>
+                        </ul>
+                    </div>
+                </div>
+            </template>
+        </main>
+
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <span>Powered by Greenlight v2</span>
+            <span class="footer-divider">|</span>
+            <span>Agentforce Testing Automation</span>
+        </footer>
+
+        <!-- Copy Toast -->
+        <div class="copy-toast">Copied!</div>
+    </div>
+</template>

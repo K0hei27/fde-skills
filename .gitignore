@@ -23,6 +23,10 @@ greenlight-output/
 *.log
 
 # Salesforce
-force-app/
 .sfdx/
 .sf/
+
+# Ignore retrieved metadata but keep LWC dashboard
+force-app/main/default/bots/
+force-app/main/default/genAiPlannerBundles/
+force-app/main/default/aiEvaluationDefinitions/
