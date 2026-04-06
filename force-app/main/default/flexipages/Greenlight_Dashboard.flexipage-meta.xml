@@ -4,7 +4,7 @@
         <itemInstances>
             <componentInstance>
                 <componentName>c:greenlightDashboard</componentName>
-                <identifier>greenlightDashboard1</identifier>
+                <identifier>c_greenlightDashboard</identifier>
             </componentInstance>
         </itemInstances>
         <name>main</name>
