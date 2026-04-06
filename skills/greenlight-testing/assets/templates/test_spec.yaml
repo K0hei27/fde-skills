@@ -1,0 +1,5 @@
+name: {test_name}
+description: {test_description}
+agent: {agent_name}
+testCases:
+{test_cases}

@@ -1,0 +1,15 @@
+{
+  "output_directory": "greenlight-output",
+  "setup_complete": false,
+  "created_at": null,
+  "preferences": {
+    "default_accuracy_level": "high",
+    "auto_query_test_data": true,
+    "show_detailed_progress": true
+  },
+  "credit_settings": {
+    "credits_per_test_case": 0.5,
+    "overhead_percent": 10,
+    "warn_threshold": 50
+  }
+}

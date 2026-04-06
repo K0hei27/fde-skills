@@ -1,0 +1,4 @@
+# Greenlight Skill - Python Dependencies
+# Install with: pip install -r requirements.txt
+
+pyyaml>=6.0          # YAML parsing for test specs

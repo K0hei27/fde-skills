@@ -1,0 +1,58 @@
+{
+  "patterns": {
+    "no_action_called": {
+      "detection": {
+        "action_fail": true,
+        "actual_actions_empty": true
+      },
+      "root_cause": "Action not triggered",
+      "fix": "Check action instructions, verify trigger conditions match utterance patterns"
+    },
+    "wrong_action": {
+      "detection": {
+        "action_fail": true,
+        "actual_actions_different": true
+      },
+      "root_cause": "Wrong action matched",
+      "fix": "Clarify action descriptions, add disambiguation in instructions"
+    },
+    "wrong_topic": {
+      "detection": {
+        "topic_fail": true
+      },
+      "root_cause": "Routing misclassified",
+      "fix": "Adjust topic scope instructions, add boundary definitions"
+    },
+    "incomplete_response": {
+      "detection": {
+        "completeness_below_threshold": true,
+        "threshold": 0.6
+      },
+      "root_cause": "Knowledge gap or grounding issue",
+      "fix": "Add/update knowledge articles, verify article indexing"
+    },
+    "hallucination": {
+      "detection": {
+        "coherence_low": true,
+        "factually_incorrect": true
+      },
+      "root_cause": "No grounding match, made up answer",
+      "fix": "Add guardrails, improve knowledge coverage, tighten instructions"
+    },
+    "verbose_response": {
+      "detection": {
+        "conciseness_below_threshold": true,
+        "threshold": 0.6
+      },
+      "root_cause": "Over-explaining",
+      "fix": "Adjust response length instructions"
+    },
+    "latency_fail": {
+      "detection": {
+        "latency_fail": true
+      },
+      "root_cause": "Slow response chain",
+      "fix": "Optimize action chain, reduce knowledge scope"
+    }
+  }
+}

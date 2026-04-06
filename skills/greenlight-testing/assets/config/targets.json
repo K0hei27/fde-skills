@@ -1,0 +1,32 @@
+{
+  "accuracy_targets": {
+    "P0": {
+      "topic": 95,
+      "action": 90,
+      "outcome": 85
+    },
+    "P1": {
+      "topic": 90,
+      "action": 85,
+      "outcome": 80
+    },
+    "P2": {
+      "topic": 85,
+      "action": 80,
+      "outcome": 75
+    }
+  },
+  "priority_weights": {
+    "P0": 0.50,
+    "P1": 0.30,
+    "P2": 0.20
+  },
+  "credit_per_test": 0.5,
+  "default_test_cases_per_job": 50,
+  "metrics": [
+    "completeness",
+    "coherence",
+    "conciseness",
+    "latency"
+  ]
+}
